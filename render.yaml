@@ -1,9 +1,7 @@
 services:
   - type: web
-    name: fastapi-durian
-    env: docker
+    name: my-fastapi-app
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port 8000
     plan: free
-    region: singapore
-    dockerfilePath: ./Dockerfile
-    autoDeploy: true
-    branch: main
