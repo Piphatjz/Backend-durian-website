@@ -1,15 +1,10 @@
+import tensorflow as tf
 import numpy as np
 from PIL import Image
 import io
-import tflite_runtime.interpreter as tflite
 
-# โหลดโมเดล .tflite
-interpreter = tflite.Interpreter(model_path="models/durian.tflite")
-interpreter.allocate_tensors()
-
-# ดึงข้อมูล input/output ของโมเดล
-input_details = interpreter.get_input_details()
-output_details = interpreter.get_output_details()
+# โหลดโมเดล (คุณต้องวางไฟล์ durian.h5 ไว้ใน models/)
+model = tf.keras.models.load_model("models/durian.h5")
 
 # รายชื่อ class ตามลำดับ index ที่ได้จาก train_generator.class_indices
 label_map = {
@@ -27,14 +22,10 @@ def predict_disease(image_bytes):
 
     # เตรียมภาพ
     image_array = np.array(image) / 255.0
-    image_array = np.expand_dims(image_array, axis=0).astype(np.float32)
+    image_array = np.expand_dims(image_array, axis=0)
 
-    # Set input tensor
-    interpreter.set_tensor(input_details[0]['index'], image_array)
-    interpreter.invoke()
-
-    # Get output tensor
-    predictions = interpreter.get_tensor(output_details[0]['index'])[0]
+    # ทำนาย
+    predictions = model.predict(image_array)[0]
     predicted_index = int(np.argmax(predictions))
     confidence = float(predictions[predicted_index])
 
